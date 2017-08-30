@@ -1651,6 +1651,14 @@ type Tracer interface {
 	MaybeFinishTrace(ctx context.Context, err error)
 }
 
+type initModeGetter interface {
+	// Mode indicates how KBFS is configured to run.
+	Mode() InitMode
+
+	// IsTestMode() inidicates whether KBFS is running in a test.
+	IsTestMode() bool
+}
+
 // Config collects all the singleton instance instantiations needed to
 // run KBFS in one place.  The methods below are self-explanatory and
 // do not require comments.
@@ -1670,6 +1678,7 @@ type Config interface {
 	clockGetter
 	diskLimiterGetter
 	syncedTlfGetterSetter
+	initModeGetter
 	Tracer
 	KBFSOps() KBFSOps
 	SetKBFSOps(KBFSOps)
@@ -1732,12 +1741,6 @@ type Config interface {
 	// setting the rekey bit, before prompting for a paper key.
 	RekeyWithPromptWaitTime() time.Duration
 	SetRekeyWithPromptWaitTime(time.Duration)
-
-	// Mode indicates how KBFS is configured to run.
-	Mode() InitMode
-
-	// IsTestMode() inidicates whether KBFS is running in a test.
-	IsTestMode() bool
 
 	// GracePeriod specifies a grace period for which a delayed cancellation
 	// waits before actual cancels the context. This is useful for giving
